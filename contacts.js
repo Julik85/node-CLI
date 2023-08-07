@@ -17,7 +17,12 @@ const listContacts = async () => {
 const getContactById = async contactId => {
 	try {
 		const contacts = await listContacts()
-		return contacts.filter(({ id }) => id === contactId)
+		const currentContact = contacts.filter(({ id }) => id === contactId)
+		if (currentContact.length > 0){
+			return currentContact
+		} else {
+			return null
+		}
 	} catch (error) {
 		console.log(`Error: ${error.message}`)
 	}
@@ -27,9 +32,15 @@ const removeContact = async contactId => {
 	try {
 		const contacts = await listContacts()
 		const newContacts = contacts.filter(({ id }) => id === contactId)
-		await fs.writeFile(contactsPath, JSON.stringify(newContacts, null, 2), { encoding: 'utf-8' })
+		if (newContacts.length > 0) {
+			const contactsWithoutRemoved = contacts.filter((contact) => contact.id !== contactId);
+			await fs.writeFile(contactsPath, JSON.stringify(contactsWithoutRemoved, null, 2), { encoding: 'utf-8' })
+			return newContacts;
+		} else {
+			return null;
+		}
 
-		return newContacts
+		
 	} catch (error) {
 		console.log(`Error: ${error.message}`)
 	}
